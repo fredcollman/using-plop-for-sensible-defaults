@@ -31,7 +31,26 @@ const generate = (plop) => {
       {
         type: "add",
         path: "src/components/{{name}}.tsx",
-        templateFile: "_templates/component.hbs",
+        templateFile: "_templates/basicComponent.hbs",
+      },
+    ],
+  });
+
+  plop.setGenerator("component", {
+    description: "React component generator",
+    prompts: [
+      {
+        type: "input",
+        name: "name",
+        message: "what should this component be called?",
+      },
+    ],
+    actions: [
+      {
+        type: "addMany",
+        base: "_templates/component",
+        destination: "src/components/{{name}}",
+        templateFiles: "_templates/component",
       },
     ],
   });
