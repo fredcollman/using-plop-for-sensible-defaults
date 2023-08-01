@@ -1,5 +1,26 @@
+import { spawn } from "child_process";
+
+const runPrettier = (fileName) => {
+  return new Promise((resolve, reject) => {
+    const proc = spawn("prettier", ["--write", fileName]);
+    proc.on("close", (code) => {
+      if (code === 0) {
+        resolve("formatted with prettier");
+      } else {
+        reject("ERROR: prettier failed");
+      }
+    });
+  });
+};
+
+const runPrettierAction = (answers, config, plop) => {
+  const resolvedPath = plop.renderString(config.path, answers);
+  return runPrettier(resolvedPath);
+};
+
 const generate = (plop) => {
-  // controller generator
+  plop.setActionType("runPrettier", runPrettierAction);
+
   plop.setGenerator("hello", {
     description: "hello world generator",
     prompts: [
@@ -67,8 +88,12 @@ const generate = (plop) => {
     actions: [
       {
         type: "add",
-        path: "src/hooks/use{{ pascalCase name}}.tsx",
+        path: "src/hooks/use{{ pascalCase name }}.tsx",
         templateFile: "_templates/context.hbs",
+      },
+      {
+        type: "runPrettier",
+        path: "src/hooks/use{{ pascalCase name }}.tsx",
       },
     ],
   });
