@@ -54,6 +54,24 @@ const generate = (plop) => {
       },
     ],
   });
+
+  plop.setGenerator("context", {
+    description: "React context generator",
+    prompts: [
+      {
+        type: "input",
+        name: "name",
+        message: "what should this context be called?",
+      },
+    ],
+    actions: [
+      {
+        type: "add",
+        path: "src/hooks/use{{ pascalCase name}}.tsx",
+        templateFile: "_templates/context.hbs",
+      },
+    ],
+  });
 };
 
 export default generate;
