@@ -17,6 +17,24 @@ const generate = (plop) => {
       },
     ],
   });
+
+  plop.setGenerator("basicComponent", {
+    description: "basic React component generator",
+    prompts: [
+      {
+        type: "input",
+        name: "name",
+        message: "what should this component be called?",
+      },
+    ],
+    actions: [
+      {
+        type: "add",
+        path: "src/components/{{name}}.tsx",
+        templateFile: "_templates/component.hbs",
+      },
+    ],
+  });
 };
 
 export default generate;
