@@ -1,7 +1,7 @@
 # Using Plop for sensible defaults
 
 ## What is Plop?
-Plop is a Node CLI tool for generating files.
+[Plop](https://plopjs.com/) is a Node CLI tool for generating files.
 
 It's super helpful for automating the kind of repetitive boilerplate that you might write several times a day.
 This saves you time - and [yes, there's an xkcd for that](https://xkcd.com/1205/).
