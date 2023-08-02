@@ -24,8 +24,9 @@ I'm using `pnpm`, but it should work OK with `npm` or `yarn` instead.
 
 ```sh
 git clone https://github.com/fredcollman/using-plop-for-sensible-defaults
+cd using-plop-for-sensible-defaults
 git switch start-here
-pnpm install  # or `npm install`, or `yarn`
+pnpm install
 ```
 
 This is a fully functional, albeit sparse, NextJS app. You can run
