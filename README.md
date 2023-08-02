@@ -23,11 +23,19 @@ To begin with, clone this repo. It's overkill for the first example, but will he
 I'm using `pnpm`, but it should work OK with `npm` or `yarn` instead.
 
 ```sh
-git clone TODO
-git switch TODO
+git clone https://github.com/fredcollman/using-plop-for-sensible-defaults
+git switch start-here
 pnpm install  # or `npm install`, or `yarn`
 ```
 
+This is a fully functional, albeit sparse, NextJS app. You can run
+
+```sh
+pnpm dev  # run a dev server
+pnpm storybook  # run a storybook server
+pnpm test  # run tests
+```
+to play around with this repo like it is a "proper" codebase.
 
 ### Add the first generator
 In your code editor, open up `plopfile.mjs`.
@@ -73,27 +81,19 @@ pnpm plop  # or `npx plop`, or `yarn plop`
 
 Enter `World` when asked for your name (or enter your real name) and hit return.
 
-Take a look in the `src/` directory - you should see a new file `src/World.js`.
-
-Looking in `src/World.js`, you'll see it says `Hello, World!`.
-
-Clearly this isn't valid JavaScript, but we're up and running.
+Take a look in the `src/` directory - you should see a new file `src/World.js`. Looking in `src/World.js`, you'll see it says `Hello, World!`. Clearly this isn't valid JavaScript, but we're up and running.
 
 Now try running `pnpm plop Gary` and see that `src/Gary.js` is generated with `Hello, Gary!`.
 
 ## What just happened?
-Plop is built on top of two other tools - Handlebars and Inquirer.
+Plop is built on top of two other tools - [Handlebars](https://handlebarsjs.com/) and [Inquirer](https://github.com/SBoudrias/Inquirer.js/).
 
-Handlebars is a templating language. In particular anything inside `{{ double_braces }}` will be replaced with the value of `double_braces` variable.
+Inquirer is a tool for requesting user input. Plop uses Inquirer to collect variables ("answers") to use - this is the `prompts` array in our plopfile.
 
-Inquirer is a tool for requesting user input.
-
-Plop uses Inquirer to collect variables ("answers") to use - this is the `prompts` array in our plopfile.
-
-Then Plop passes those answers through Handlebars templates to generate files in a way we configure in the `actions` array. Note that the `path` of our action (`"src/{{name}}.js"`) is a template too!
+Handlebars is a templating language. In particular anything inside `{{ double_braces }}` will be replaced with the value of `double_braces` variable. Plop passes the collected answers through Handlebars templates to generate files. We configure this in the `actions` array. Note that the `path` of our action (`"src/{{name}}.js"`) is a template too!
 
 ## A more practical generator
-Let's add a more useful example.
+Now that we've automated greeting people, let's add a more useful example.
 
 Add this Handlebars template to `_templates/basicComponent.hbs`:
 
@@ -111,42 +111,43 @@ const {{ name }} = ({ children }: Props) => {
 export default {{ name }};
 ```
 
-Note that Handlebars will replace content within double braces, like `{{ name }}`. Content in single braces, like `{ children }`, will be left untouched.
+Note that Handlebars will only replace content within _double_ braces, like `{{ name }}`. Content in single braces, like `{ children }`, will be left untouched.
 
 Can you figure out how to add a generator to our plopfile so this will create a component?
 
 e.g. if the user types `pnpm plop basicComponent Spinner`, we will generate a new file at `src/components/Spinner.ts`.
 
 <details>
-    <summary>Expand to reveal</summary>
+<summary>Expand to reveal</summary>
 
-    ```js
-    const generate = (plop) => {
-      plop.setGenerator("hello", {
-        // unchanged
-      };
+```js
+const generate = (plop) => {
+  plop.setGenerator("hello", {
+    // unchanged
+  };
 
-      plop.setGenerator("basicComponent", {
-        description: "basic React component generator",
-        prompts: [
-          {
-            type: "input",
-            name: "name",
-            message: "what should this component be called?",
-          },
-        ],
-        actions: [
-          {
-            type: "add",
-            path: "src/components/{{name}}.tsx",
-            templateFile: "_templates/basicComponent.hbs",
-          },
-        ],
-      });
-    };
+  plop.setGenerator("basicComponent", {
+    description: "basic React component generator",
+    prompts: [
+      {
+        type: "input",
+        name: "name",
+        message: "what should this component be called?",
+      },
+    ],
+    actions: [
+      {
+        type: "add",
+        path: "src/components/{{name}}.tsx",
+        templateFile: "_templates/basicComponent.hbs",
+      },
+    ],
+  });
+};
 
-    export default generate;
-    ```
+export default generate;
+```
+
 </details>
 
 Try generating a few components.
@@ -192,23 +193,28 @@ const generate = (plop) => {
 Have a go at implementing templates inside the `_templates` folder so that `pnpm plop component Hero` will generate a Hero component and, along with tests and stories.
 
 <details>
-    <summary>Here's a clue</summary>
+<summary>Here's a clue</summary>
 
-    The templates should go in these files:
-    - _templates/component/index.ts.hbs
-    - _templates/component/{{ name }}.stories.tsx.hbs
-    - _templates/component/{{ name }}.test.tsx.hbs
-    - _templates/component/{{ name }}.tsx.hbs
+The templates should go in these files:
+- _templates/component/index.ts.hbs
+- _templates/component/{{ name }}.stories.tsx.hbs
+- _templates/component/{{ name }}.test.tsx.hbs
+- _templates/component/{{ name }}.tsx.hbs
+
 </details>
 
 Take a look at the other action types here: https://plopjs.com/documentation/#built-in-actions
 
 ## Helpers
-Plop ships with a bunch of helpers for Handlebars templates. These are little manipulation functions.
+Handlebars ships with "helpers", which are functions to extend Handlebars' functionality. Examples include `{{#if isUseful}}` and `{{#each items}}` for conditionals and looping.
 
-The `pascalCase` helper could be particularly useful for our component.
+Plop ships with a bunch of extra Plop-specific helpers for Handlebars templates. The `pascalCase` helper could be particularly useful for our component.
 
 Try using `{{ pascalCase name }}` instead of `{{ name }}`, and check that `pnpm plop component button` does what you expect it to.
+
+Find out more about helpers
+- in Handlebars here: https://handlebarsjs.com/guide/builtin-helpers.html
+- in Plop here: https://plopjs.com/documentation/#built-in-helpers
 
 ## Custom action types
 We can define our own actions.
@@ -277,17 +283,21 @@ Rather than an aspirational document sitting somewhere in your knowledge base, y
 Plop doesn't just save you time, it helps you improve the readability of your codebase.
 
 ## Alternatives
-There are other tools that achieve a similar goal. [Hygen] is another JS-based tool.
-It stores some config, like the output `path`, directly in the template as YAML-like metadata.
+There are other tools that achieve a similar goal. [Hygen](https://www.hygen.io/) is another JS-based tool.
+Hygen stores some config, like the output `path`, directly in the template as YAML-like metadata.
 This can ease the pain of a centralised config (all in the plopfile) in very large/busy repos.
 
 If you're working in a language other than JS/TS, it may make sense to use a tool from that ecosystem.
 This will make it easier for developers on your team to chip in with changes.
-[Cookiecutter] is a Python-based tool with similar goals.
+[Cookiecutter](https://github.com/cookiecutter/cookiecutter) is a Python-based tool with similar goals.
+
+Some frameworks, like [Ruby-on-Rails](https://guides.rubyonrails.org/command_line.html) and [RedwoodJS](https://redwoodjs.com/docs/cli-commands#generate-alias-g) ship with their own code scaffolding tools.
 
 Codemods and AST manipulation are another way of approaching this problem.
 These are typically more complex to implement - you need to understand how ASTs work, for starters!
 The benefit is that they can be more powerful, if the code generation logic is more nuanced.
+
+As with any tool, it's best to do the simplest thing that works. If you find your plopfile or templates getting very complicated, it might be a code smell. For example, you'd be better off defining a function once in your code and _importing it_ in your template, rather than redefining the function in every template.
 
 ## Try it yourself
 If you want to explore Plop further you could
@@ -296,3 +306,4 @@ If you want to explore Plop further you could
 2. customise the output of the component generator to match your house style guidelines
 3. add a new generator, e.g. for a Redux duck, to wrap react-query's useQuery, or to scaffold an entire library
 4. visit the docs https://plopjs.com/documentation
+5. find inspiration at https://github.com/plopjs/awesome-plop
